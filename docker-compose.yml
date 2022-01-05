@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  backend:
+    build: 
+      # the docker-compose.yml will use the Dockerfile in the current directory
+      context: .
+      dockerfile: Dockerfile
+      # replaces docker-compose exec backend sh to run shell script to run docker migrations
+      # restart: always
+    ports:
+      - "8000:8000" # localhost port:docker port
+    volumes:
+      - .:/app # all files in the current directory '.' are connected with the docker container in /app
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14
+    restart: always # sometimes database server stops, causing the entire app to crash. Automatically restarts
+    environment:
+      # - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=derek
+      - POSTGRES_PASSWORD=derek
+    volumes: # when the app stores data it needs to go into a directory
+      - .dbdata:/var/lib/postgres/data
